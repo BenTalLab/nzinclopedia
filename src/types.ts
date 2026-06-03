@@ -1,8 +1,8 @@
 export interface PredictionDetails {
-    structureId: string
-    pdbZnResseq: string
-    ligandResiType: string
-    zincsightProb: number
-    predZnCoord: number[]
-    mahomes2Prediction: boolean
+    source: string
+    uniprot: string
+    coord: number[]
+    residues: string
+    zincsight: number
+    mahomesii: boolean
 }

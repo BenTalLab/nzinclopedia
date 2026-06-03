@@ -32,7 +32,7 @@ const MolstarViewer = ({darkMode, details, onClose}: {darkMode: boolean, details
             }
             pluginRef.current = plugin;
 
-            const [x, y, z] = details.predZnCoord
+            const [x, y, z] = details.coord
 
             const pdbIon = [
                 'HETATM'.padEnd(6),
@@ -50,13 +50,13 @@ const MolstarViewer = ({darkMode, details, onClose}: {darkMode: boolean, details
                 'Zn'.padStart(2)
             ].join('')
 
-            const url = `https://alphafold.ebi.ac.uk/files/AF-${details.structureId}-F1-model_v6.pdb`
+            const url = `https://alphafold.ebi.ac.uk/files/AF-${details.uniprot}-F1-model_v6.pdb`
             const pdbRows = (await (await fetch(url)).text()).split('\n')
             const terIndex = pdbRows.findIndex(row => row.startsWith('TER'))
             pdbRows.splice(terIndex + 1, 0, pdbIon)
             const pdb = pdbRows.join('\n')
 
-            const data = await plugin.builders.data.rawData({data: pdb, label: details.structureId})
+            const data = await plugin.builders.data.rawData({data: pdb, label: details.uniprot})
 
             const trajectory = await plugin.builders.structure.parseTrajectory(data, 'pdb');
             await plugin.builders.structure.hierarchy.applyPreset(trajectory, 'default');
@@ -77,7 +77,7 @@ const MolstarViewer = ({darkMode, details, onClose}: {darkMode: boolean, details
     return (
         <Modal
             open={!!details}
-            title={details?.structureId}
+            title={details?.uniprot}
             closable={{onClose, afterClose: () => pluginRef.current?.dispose()}}
             footer={null}
             width={840}

@@ -3,6 +3,10 @@ body {
   height: 100vh;
 }
 
+.ant-layout-header {
+    background-color: transparent;
+}
+
 .ant-dropdown-menu-title-content {
     white-space: nowrap;
 }

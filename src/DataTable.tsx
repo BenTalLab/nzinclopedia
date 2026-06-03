@@ -3,7 +3,7 @@ import type {InputRef, TableColumnType} from 'antd'
 import {Button, Flex, Input, InputNumber, Progress, Result, Space, Spin, Table, Tag} from 'antd'
 import Papa, {type ParseResult} from 'papaparse'
 import {useEffect, useRef, useState} from 'react'
-import _, {camelCase, replace} from 'lodash'
+import _, {camelCase} from 'lodash'
 import type {PredictionDetails} from './types.ts'
 import type {InputNumberRef} from '@rc-component/input-number'
 import MolstarViewer from './MolstarViewer.tsx'
@@ -17,6 +17,14 @@ const percentageColors = [
     '#D4FF00',
     '#AAFF00',
     '#55FF00'
+]
+
+const sources = [
+    'Dark Proteome',
+    'MDH H-like β-propeller',
+    'Rossmann',
+    'TIM barrel',
+    'TED'
 ]
 
 const DataTable = ({darkMode}: {darkMode: boolean}) => {
@@ -39,17 +47,14 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
             transformHeader: camelCase,
             transform: (value: string, header: string) => {
                 switch(header) {
-                    case 'structureId':
-                        return value.split('-')[1]
-                    case 'predZnCoord':
+                    case 'source':
+                        return sources[parseInt(value)-1]
+                    case 'coord':
                         return value.split(',').map(parseFloat)
-                    case 'zincsightProb':
-                    case 'mahomes2ProbCatalytic':
+                    case 'zincsight':
                         return parseFloat(value)
-                    case 'mahomes2Prediction':
-                        return value === 'Catalytic'
-                    case 'ligandResiType':
-                        return replace(value, /\W/g, '').split('').sort().join('')
+                    case 'mahomesii':
+                        return value === '1'
                 }
                 return value
             },
@@ -57,7 +62,7 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
                 if (errors.length > 0) {
                     setError(true)
                 } else {
-                    data = data.map((row) => ({...row, key: `${row['structureId']}.${row['pdbZnResseq']}`}))
+                    data = data.map((row, key) => ({...row, key}))
                     setData(data)
                 }
                 setLoading(false)
@@ -83,17 +88,26 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
 
     const columns: TableColumnType<PredictionDetails>[] = [
         {
-            key: 'structureId',
-            dataIndex: 'structureId',
-            title: 'UniProt accession',
-            sorter: (a, b) => a.structureId.localeCompare(b.structureId),
+            key: 'source',
+            dataIndex: 'source',
+            title: 'Source',
+            sorter: (a, b) => a.source.localeCompare(b.source),
+            width: 200,
+            filters: _(data).map('source').uniq().sortedUniq().map(value => ({value, text: value})).value(),
+            onFilter: (value, record) => record.source === value
+        },
+        {
+            key: 'uniprot',
+            dataIndex: 'uniprot',
+            title: 'UniProt Accession',
+            sorter: (a, b) => a.uniprot.localeCompare(b.uniprot),
             width: 220,
             filterDropdown: ({confirm, setSelectedKeys}) =>
                 <div style={{padding: 10}}>
                     <Input.Search
                         enterButton
                         allowClear
-                        ref={structureIdSearchInput} placeholder='Enter structure identifier'
+                        ref={structureIdSearchInput} placeholder='Enter UniProt accession'
                         onSearch={value => {
                             setSelectedKeys(value.trim() ? [value] : [])
                             confirm()
@@ -101,7 +115,7 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
                     />
                 </div>,
             onFilter: (value, record) =>
-                record.structureId.toLowerCase() === (value as string).trim().toLowerCase(),
+                record.uniprot.toLowerCase() === (value as string).trim().toLowerCase(),
             filterDropdownProps: {
                 onOpenChange: open => {
                     if(open) {
@@ -111,22 +125,22 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
             }
         },
         {
-            key: 'ligandResiType',
-            dataIndex: 'ligandResiType',
+            key: 'residues',
+            dataIndex: 'residues',
             title: 'Binding Residues',
-            sorter: (a, b) => a.ligandResiType.localeCompare(b.ligandResiType),
+            sorter: (a, b) => a.residues.localeCompare(b.residues),
             width: 200,
             onCell: () => ({style: {fontSize: 20, letterSpacing: 10}}),
-            filters: _(data).map('ligandResiType').uniq().sortedUniq().map(value => ({value, text: value})).value(),
-            onFilter: (value, record) => record.ligandResiType === value
+            filters: _(data).map('residues').uniq().sortedUniq().map(value => ({value, text: value})).value(),
+            onFilter: (value, record) => record.residues === value
         },
         {
-            key: 'zincsightProb',
-            dataIndex: 'zincsightProb',
+            key: 'zincsight',
+            dataIndex: 'zincsight',
             title: 'ZincSight %',
             render: value => <Progress success={{percent: 0}} percent={value} steps={10} size='small' strokeColor={percentageColors[Math.min(7, Math.round(value / 10))]}/>,
             width: 200,
-            sorter: (a, b) => a.zincsightProb - b.zincsightProb,
+            sorter: (a, b) => a.zincsight - b.zincsight,
             filterDropdown: ({confirm, setSelectedKeys}) =>
                 <Space.Compact style={{padding: 10}}>
                     <InputNumber
@@ -152,7 +166,7 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
                     />
                 </Space.Compact>,
             onFilter: (value, record) =>
-                record.zincsightProb >= (value as number),
+                record.zincsight >= (value as number),
             filterDropdownProps: {
                 onOpenChange: open => {
                     if(open) {
@@ -162,16 +176,16 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
             }
         },
         {
-            key: 'mahomes2Prediction',
-            dataIndex: 'mahomes2Prediction',
+            key: 'mahomesii',
+            dataIndex: 'mahomesii',
             title: 'MAHOMES II',
             width: 180,
-            sorter: (a, b) => (a.mahomes2Prediction as unknown as number) - (b.mahomes2Prediction as unknown as number),
+            sorter: (a, b) => (a.mahomesii as unknown as number) - (b.mahomesii as unknown as number),
             render: value => value ?
                 <Tag style={{width: 100, textAlign: 'center'}} variant='outlined' color='green'>Catalytic</Tag> :
                 <Tag style={{width: 100, textAlign: 'center'}} variant='outlined' color='red'>Not Catalytic</Tag>,
             filters: [{value: true, text: 'Catalytic'}, {value: false, text: 'Not Catalytic'}],
-            onFilter: (value, record) => record.mahomes2Prediction === value
+            onFilter: (value, record) => record.mahomesii === value
         },
         {
             key: 'actions',
@@ -182,7 +196,7 @@ const DataTable = ({darkMode}: {darkMode: boolean}) => {
 
     return(
         <>
-            <Table columns={columns} dataSource={data} style={{maxWidth: 1000, margin: '30px auto'}}/>
+            <Table columns={columns} dataSource={data} style={{maxWidth: 1200, margin: '30px auto'}}/>
             <MolstarViewer darkMode={darkMode} details={modalDetails} onClose={() => setModalDetails(null)}/>
         </>
     )

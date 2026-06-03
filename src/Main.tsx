@@ -1,7 +1,7 @@
-import {App, Button, ConfigProvider, Layout, theme} from 'antd'
+import {App, Button, ConfigProvider, Flex, Layout, theme} from 'antd'
 import DataTable from './DataTable.tsx'
 import {useEffect, useState} from 'react'
-import {MoonOutlined, SunOutlined} from '@ant-design/icons'
+import {DownloadOutlined, MoonOutlined, SunOutlined} from '@ant-design/icons'
 
 
 const Main = () => {
@@ -17,11 +17,23 @@ const Main = () => {
             <App>
                 <Layout style={{minHeight: '100vh'}}>
                     <Layout.Header>
-                        <Button
-                            variant='filled'
-                            icon={darkMode ? <SunOutlined/> : <MoonOutlined/>}
-                            onClick={() => {setDarkMode(!darkMode)}}
-                        />
+                        <Flex>
+                            <Flex flex={1}>n-zinclopedia</Flex>
+                            <Flex align="center" gap="small">
+                                <Button
+                                    variant="filled"
+                                    icon={<DownloadOutlined/>}
+                                    href='nzinclopedia.csv'
+                                    target="_blank">
+                                    Download n-zinclopedia data
+                                </Button>
+                                <Button
+                                    variant="filled"
+                                    icon={darkMode ? <SunOutlined/> : <MoonOutlined/>}
+                                    onClick={() => {setDarkMode(!darkMode)}}
+                                />
+                            </Flex>
+                        </Flex>
                     </Layout.Header>
                     <Layout.Content>
                         <DataTable darkMode={darkMode}/>
