@@ -5,6 +5,10 @@ body {
 
 .ant-layout-header {
     background-color: transparent;
+    height: 140px;
+    width: 1200px;
+    margin: 0 auto;
+    padding: 0;
 }
 
 .ant-dropdown-menu-title-content {
@@ -16,4 +20,19 @@ body {
 .msp-layout-standard .msp-layout-left,
 .msp-layout-standard .msp-layout-right {
     display: none;
+}
+
+#logo-icon {
+    width: 160px;
+    height: 160px;
+}
+
+#logo-title {
+    font-size: xxx-large;
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+#logo-subtitle {
+    font-size: x-large;
 }

@@ -1,8 +1,8 @@
-import {App, Button, ConfigProvider, Flex, Layout, theme} from 'antd'
+import {App, Button, Tooltip, ConfigProvider, Flex, Layout, theme} from 'antd'
 import DataTable from './DataTable.tsx'
 import {useEffect, useState} from 'react'
-import {DownloadOutlined, MoonOutlined, SunOutlined} from '@ant-design/icons'
-
+import {ArrowDownOutlined, MoonOutlined, SunOutlined} from '@ant-design/icons'
+import {green, blue, orange} from '@ant-design/colors'
 
 const Main = () => {
 
@@ -18,20 +18,35 @@ const Main = () => {
                 <Layout style={{minHeight: '100vh'}}>
                     <Layout.Header>
                         <Flex>
-                            <Flex flex={1}>n-zinclopedia</Flex>
+                            <Flex flex={1}>
+                                <Flex>
+                                    <img id="logo-icon" src="nzinclopedia.png" alt="n-zinclopedia logo"/>
+                                    <div>
+                                        <div id="logo-title"><span style={{color: green[6]}}>N-</span><span style={{color: blue[4]}}>Zinc</span><span style={{color: orange[5]}}>lopedia</span></div>
+                                        <div id="logo-subtitle">a database of predicted transition metal binding sites</div>
+                                    </div>
+                                </Flex>
+                            </Flex>
                             <Flex align="center" gap="small">
-                                <Button
-                                    variant="filled"
-                                    icon={<DownloadOutlined/>}
-                                    href='nzinclopedia.csv'
-                                    target="_blank">
-                                    Download n-zinclopedia data
-                                </Button>
-                                <Button
-                                    variant="filled"
-                                    icon={darkMode ? <SunOutlined/> : <MoonOutlined/>}
-                                    onClick={() => {setDarkMode(!darkMode)}}
-                                />
+                                <Tooltip title="Download the entire N-Zinclopedia database as a CSV file">
+                                    <Button
+                                        type="primary"
+                                        variant="filled"
+                                        icon={<ArrowDownOutlined/>}
+                                        size="large"
+                                        href='nzinclopedia.csv'
+                                        target="_blank">
+                                        Download the database
+                                    </Button>
+                                </Tooltip>
+                                <Tooltip title={`Switch to ${darkMode ? 'light' : 'dark'} mode`}>
+                                    <Button
+                                        variant="filled"
+                                        icon={darkMode ? <SunOutlined/> : <MoonOutlined/>}
+                                        size="large"
+                                        onClick={() => {setDarkMode(!darkMode)}}
+                                    />
+                                </Tooltip>
                             </Flex>
                         </Flex>
                     </Layout.Header>
