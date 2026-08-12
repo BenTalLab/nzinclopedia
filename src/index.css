@@ -36,3 +36,8 @@ body {
 #logo-subtitle {
     font-size: x-large;
 }
+
+#references {
+    width: 1200px;
+    margin: 0 auto;
+}

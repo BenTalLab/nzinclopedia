@@ -52,6 +52,12 @@ const Main = () => {
                     </Layout.Header>
                     <Layout.Content>
                         <DataTable darkMode={darkMode}/>
+                        <div id="references">
+                            <p>
+                                Mechtinger, G., Axel, G., Kolodny, R., & Ben‐Tal, N. (2025). Interpretable prediction of zinc ion location in proteins with ZincSight. Protein Science, 34(11), e70350.&nbsp;
+                                <a href="https://doi.org/10.1002/pro.70350">https://doi.org/10.1002/pro.70350</a>
+                            </p>
+                        </div>
                     </Layout.Content>
                 </Layout>
             </App>
